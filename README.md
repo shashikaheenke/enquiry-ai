@@ -14,6 +14,20 @@ https://enquiry-ai-api.onrender.com
 
 > The backend is hosted on Render's free tier, so the first request may take a short time if the service has been inactive.
 
+## Screenshots
+
+### Desktop Dashboard
+
+![EnquiryAI Desktop Top](screenshots/dashboard-top.png)
+
+![EnquiryAI Desktop Enquiry List](screenshots/dashboard-list.png)
+
+### Mobile View
+
+![EnquiryAI Mobile Top](screenshots/mobile-top.png)
+
+![EnquiryAI Mobile Enquiry List](screenshots/mobile-list.png)
+
 ## Features
 
 - AI-powered customer enquiry extraction
