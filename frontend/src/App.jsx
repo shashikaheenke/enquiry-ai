@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, Sparkles, Workflow } from 'lucide-react';
+import { Bot, Sparkles, Workflow, LoaderCircle } from 'lucide-react';
 
 import EnquiryForm from './components/EnquiryForm';
 import ExtractionResult from './components/ExtractionResult';
@@ -19,23 +19,41 @@ function App() {
   const [enquiries, setEnquiries] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [enquiriesLoading, setEnquiriesLoading] = useState(true);
+
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
 
-  const loadEnquiries = async () => {
+  const loadEnquiries = async ({ showLoading = false } = {}) => {
+    if (showLoading) {
+      setEnquiriesLoading(true);
+      setLoadError('');
+    }
+
     try {
       const data = await getEnquiries();
       setEnquiries(data);
     } catch (err) {
       console.error(err);
+
+      if (showLoading) {
+        setLoadError(
+          'Enquiries are taking longer than expected to load. The backend may be starting up.',
+        );
+      }
+    } finally {
+      if (showLoading) {
+        setEnquiriesLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    loadEnquiries();
+    loadEnquiries({ showLoading: true });
   }, []);
 
   const handleExtract = async () => {
@@ -64,6 +82,10 @@ function App() {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleRetryLoad = async () => {
+    await loadEnquiries({ showLoading: true });
   };
 
   const filteredEnquiries = enquiries.filter((item) => {
@@ -171,54 +193,97 @@ function App() {
           </div>
         </section>
 
-        <section className="mb-8">
-          <DashboardStats enquiries={enquiries} />
-        </section>
+        {enquiriesLoading ? (
+          <section className="mb-8">
+            <div className="rounded-2xl border border-white/8 bg-slate-900/60 p-8">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+                  <LoaderCircle size={24} className="animate-spin" />
+                </div>
 
-        <section className="grid gap-6 2xl:grid-cols-2">
-          <EnquiryForm
-            enquiry={enquiry}
-            setEnquiry={setEnquiry}
-            onExtract={handleExtract}
-            loading={loading}
-            error={error}
-          />
+                <h2 className="mt-4 text-lg font-semibold text-white">
+                  Loading enquiries
+                </h2>
 
-          <ExtractionResult result={result} />
-        </section>
+                <p className="mt-2 max-w-lg text-sm leading-6 text-slate-400">
+                  Fetching the latest enquiry data. The first request may take a
+                  little longer while the backend starts up.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : loadError ? (
+          <section className="mb-8">
+            <div className="rounded-2xl border border-amber-400/15 bg-amber-400/5 p-6">
+              <p className="font-semibold text-amber-300">
+                Unable to load enquiries
+              </p>
 
-        <section className="mt-10 sm:mt-12">
-          <div className="mb-6">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-400">
-              Workspace
-            </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {loadError}
+              </p>
 
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Enquiry management
-            </h2>
+              <button
+                type="button"
+                onClick={handleRetryLoad}
+                className="mt-4 rounded-lg bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-200"
+              >
+                Try again
+              </button>
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="mb-8">
+              <DashboardStats enquiries={enquiries} />
+            </section>
 
-            <p className="mt-2 max-w-2xl text-base leading-7 text-slate-400">
-              Search, prioritise and manage all AI-processed enquiries from one
-              workspace.
-            </p>
-          </div>
+            <section className="grid gap-6 2xl:grid-cols-2">
+              <EnquiryForm
+                enquiry={enquiry}
+                setEnquiry={setEnquiry}
+                onExtract={handleExtract}
+                loading={loading}
+                error={error}
+              />
 
-          <div className="mb-5">
-            <EnquiryFilters
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              priorityFilter={priorityFilter}
-              setPriorityFilter={setPriorityFilter}
-            />
-          </div>
+              <ExtractionResult result={result} />
+            </section>
 
-          <EnquiryDashboard
-            enquiries={filteredEnquiries}
-            onStatusChange={handleStatusChange}
-          />
-        </section>
+            <section className="mt-10 sm:mt-12">
+              <div className="mb-6">
+                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-400">
+                  Workspace
+                </p>
+
+                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Enquiry management
+                </h2>
+
+                <p className="mt-2 max-w-2xl text-base leading-7 text-slate-400">
+                  Search, prioritise and manage all AI-processed enquiries from
+                  one workspace.
+                </p>
+              </div>
+
+              <div className="mb-5">
+                <EnquiryFilters
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                  priorityFilter={priorityFilter}
+                  setPriorityFilter={setPriorityFilter}
+                />
+              </div>
+
+              <EnquiryDashboard
+                enquiries={filteredEnquiries}
+                onStatusChange={handleStatusChange}
+              />
+            </section>
+          </>
+        )}
       </main>
     </div>
   );
