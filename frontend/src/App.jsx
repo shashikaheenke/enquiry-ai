@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, Sparkles } from 'lucide-react';
+import { Bot, Sparkles, Workflow } from 'lucide-react';
 
 import EnquiryForm from './components/EnquiryForm';
 import ExtractionResult from './components/ExtractionResult';
@@ -142,6 +142,33 @@ function App() {
             Automatically extract customer details, identify urgency, categorise
             requests and organise incoming enquiries using AI.
           </p>
+        </section>
+
+        <section className="mb-8">
+          <div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/5 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300">
+                <Workflow size={21} />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-400">
+                  Automated Intake
+                </p>
+
+                <h2 className="mt-1 text-xl font-bold text-white">
+                  Email enquiries can flow into the dashboard automatically
+                </h2>
+
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400 sm:text-base">
+                  Customer enquiry emails can be processed through n8n, analysed
+                  with AI, stored in Supabase, and surfaced in this dashboard
+                  without manual copy and paste. High-priority enquiries can
+                  also trigger automated alerts.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="mb-8">
