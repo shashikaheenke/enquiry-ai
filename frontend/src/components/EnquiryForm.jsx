@@ -1,4 +1,4 @@
-import { Sparkles, WandSparkles, RotateCcw } from 'lucide-react';
+import { Sparkles, WandSparkles, RotateCcw, LoaderCircle } from 'lucide-react';
 
 function EnquiryForm({ enquiry, setEnquiry, onExtract, loading, error }) {
   const sampleEnquiry =
@@ -28,7 +28,8 @@ function EnquiryForm({ enquiry, setEnquiry, onExtract, loading, error }) {
         <button
           type="button"
           onClick={() => setEnquiry(sampleEnquiry)}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-200"
+          disabled={loading}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <RotateCcw size={16} />
           Use sample
@@ -38,8 +39,9 @@ function EnquiryForm({ enquiry, setEnquiry, onExtract, loading, error }) {
       <textarea
         value={enquiry}
         onChange={(e) => setEnquiry(e.target.value)}
+        disabled={loading}
         placeholder="Example: Hi, I'm Mark Taylor. My boiler has stopped working and we have no heating. Please call me urgently..."
-        className="min-h-64 flex-1 resize-y rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-base leading-8 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 sm:p-6 sm:text-lg"
+        className="min-h-64 flex-1 resize-y rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-base leading-8 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-60 sm:p-6 sm:text-lg"
       />
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -48,15 +50,34 @@ function EnquiryForm({ enquiry, setEnquiry, onExtract, loading, error }) {
         </div>
 
         <button
+          type="button"
           onClick={onExtract}
           disabled={!canExtract}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 to-blue-500 px-6 py-3.5 text-base font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+          className="inline-flex w-full min-w-48 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 to-blue-500 px-6 py-3.5 text-base font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:w-auto"
         >
-          <WandSparkles size={19} />
-
-          {loading ? 'Analysing enquiry...' : 'Extract with AI'}
+          {loading ? (
+            <>
+              <LoaderCircle size={19} className="animate-spin" />
+              Analysing enquiry...
+            </>
+          ) : (
+            <>
+              <WandSparkles size={19} />
+              Extract with AI
+            </>
+          )}
         </button>
       </div>
+
+      {loading && (
+        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-cyan-400/10 bg-cyan-400/5 px-4 py-3 text-sm text-cyan-200">
+          <LoaderCircle size={17} className="shrink-0 animate-spin" />
+
+          <span>
+            AI is reading the enquiry and extracting the business details...
+          </span>
+        </div>
+      )}
 
       {error && (
         <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-4 text-base text-red-300">
